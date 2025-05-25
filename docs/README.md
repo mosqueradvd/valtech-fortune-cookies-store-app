@@ -79,3 +79,6 @@ In order to apply CSS customizations in this and other blocks, follow the instru
 | `fortuneCookieRight` |
 | `fortuneCookiePhrase` |
 
+## Improvements
+
+⚠️ ***Currently the app is leaving access keys exposed, for future development it will be necessary to modify the development to handle request authentication in a more secure way.***
