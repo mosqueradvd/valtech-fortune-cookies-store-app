@@ -3,6 +3,7 @@ import { Spinner } from 'vtex.styleguide'
 import { useFortuneCookies } from '../../hooks/useFortuneCookies'
 import { FortuneCookie } from '../../typings/FortuneCookie'
 import { useCssHandles } from 'vtex.css-handles'
+import { useIntl } from 'react-intl'
 
 const CSS_HANDLES = [
     'fortuneCookieMainBtn',
@@ -26,6 +27,7 @@ const IMAGE_URL =
     'https://i.imgur.com/mbmTTSW.png'
 
 const FortuneCard: React.FC = () => {
+    const intl = useIntl()
     const handles = useCssHandles(CSS_HANDLES)
     const { data, loading: listLoading, refresh } = useFortuneCookies()
 
@@ -57,10 +59,16 @@ const FortuneCard: React.FC = () => {
                 {phrase ? (
                     <>
                         <h3 className={handles.fortuneCookiePhrase}>{phrase}</h3>
-                        <h5 className="mt4 white">Número de la suerte: {luckyNum}</h5>
+                        <h5 className="mt4 white">
+                            {intl.formatMessage({ id: 'valtech.fortune-cookies.lucky-number' })}
+                            {' '}{luckyNum}
+                        </h5>
                     </>
                 ) : (
-                    !listLoading && <p className="tc white">Haz clic para conocer tu fortuna</p>
+                    !listLoading &&
+                    <p className="tc white">
+                        {intl.formatMessage({ id: 'valtech.fortune-cookies.click-fortune' })}
+                    </p>
                 )}
 
                 <button
@@ -68,7 +76,10 @@ const FortuneCard: React.FC = () => {
                     disabled={loading || listLoading}
                     onClick={showRandom}
                 >
-                    {loading || listLoading ? <Spinner size={18} /> : 'Obtener galleta 🍪'}
+                    {loading || listLoading ?
+                        <Spinner size={18} /> :
+                        intl.formatMessage({ id: 'valtech.fortune-cookies.get-cookie' })
+                    }
                 </button>
             </div>
 

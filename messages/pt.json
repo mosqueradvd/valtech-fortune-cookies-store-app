@@ -1,4 +1,7 @@
 {
-  "admin/test": "teste",
-  "store/test": "teste"
+  "admin/test": "test",
+  "store/test": "test",
+  "valtech.fortune-cookies.click-fortune": "Clique para conhecer sua sorte",
+  "valtech.fortune-cookies.lucky-number": "Número da sorte:",
+  "valtech.fortune-cookies.get-cookie": "Obter biscoito 🍪"
 }
