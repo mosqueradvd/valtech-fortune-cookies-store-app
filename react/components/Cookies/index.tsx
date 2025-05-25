@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Spinner } from 'vtex.styleguide'
-import { useFortuneCookies } from '../../hooks/useFortuneCookies'
-import { FortuneCookie } from '../../typings/FortuneCookie'
 import { useCssHandles } from 'vtex.css-handles'
 import { useIntl } from 'react-intl'
+
+import { useFortuneCookies } from '../../hooks/useFortuneCookies'
+import { randomLuckyNumber } from '../../utils/randomLuckyNumber'
+import { FortuneCookie } from '../../typings/FortuneCookie'
 
 const CSS_HANDLES = [
     'fortuneCookieMainBtn',
@@ -12,19 +14,11 @@ const CSS_HANDLES = [
     'fortuneCookieCard',
     'fortuneCookieLeft',
     'fortuneCookieRight',
-    'fortuneCookiePhrase'
+    'fortuneCookiePhrase',
 ] as const
 
-const randomLuckyNumber = () => {
-    const pad = (n: number, len = 2) => n.toString().padStart(len, '0')
-    const a = pad(Math.floor(Math.random() * 100))
-    const b = pad(Math.floor(Math.random() * 100))
-    const c = pad(Math.floor(Math.random() * 10000), 4)
-    return `${a}-${b}-${c}`
-}
-
-const IMAGE_URL =
-    'https://i.imgur.com/mbmTTSW.png'
+const MIN_DELAY = 400
+const IMAGE_URL = 'https://i.imgur.com/mbmTTSW.png'
 
 const FortuneCard: React.FC = () => {
     const intl = useIntl()
@@ -37,21 +31,23 @@ const FortuneCard: React.FC = () => {
 
     useEffect(() => { refresh() }, [refresh])
 
-    const showRandom = async () => {
-        setPhrase(null); setLuckyNum(null); setLoading(true)
+    const showRandom = useCallback(async () => {
+        setPhrase(null)
+        setLuckyNum(null)
+        setLoading(true)
 
         if (!data.length) await refresh()
         const pool: FortuneCookie[] = data.length ? data : []
 
         if (pool.length) {
             const item = pool[Math.floor(Math.random() * pool.length)]
-            await new Promise(r => setTimeout(r, 400))
+            await new Promise(r => setTimeout(r, MIN_DELAY))
             setPhrase(item.text)
             setLuckyNum(randomLuckyNumber())
         }
 
         setLoading(false)
-    }
+    }, [data, refresh])
 
     return (
         <div className={`${handles.fortuneCookieCard} center`}>
@@ -60,15 +56,16 @@ const FortuneCard: React.FC = () => {
                     <>
                         <h3 className={handles.fortuneCookiePhrase}>{phrase}</h3>
                         <h5 className="mt4 white">
-                            {intl.formatMessage({ id: 'valtech.fortune-cookies.lucky-number' })}
-                            {' '}{luckyNum}
+                            {intl.formatMessage({ id: 'valtech.fortune-cookies.lucky-number' })}{' '}
+                            {luckyNum}
                         </h5>
                     </>
                 ) : (
-                    !listLoading &&
-                    <p className="tc white">
-                        {intl.formatMessage({ id: 'valtech.fortune-cookies.click-fortune' })}
-                    </p>
+                    !listLoading && (
+                        <p className="tc white">
+                            {intl.formatMessage({ id: 'valtech.fortune-cookies.click-fortune' })}
+                        </p>
+                    )
                 )}
 
                 <button
@@ -76,15 +73,19 @@ const FortuneCard: React.FC = () => {
                     disabled={loading || listLoading}
                     onClick={showRandom}
                 >
-                    {loading || listLoading ?
-                        <Spinner size={18} /> :
-                        intl.formatMessage({ id: 'valtech.fortune-cookies.get-cookie' })
-                    }
+                    {(loading || listLoading)
+                        ? <Spinner size={18} />
+                        : intl.formatMessage({ id: 'valtech.fortune-cookies.get-cookie' })}
                 </button>
             </div>
 
             <div className={handles.fortuneCookieRight}>
-                <img src={IMAGE_URL} alt="Fortune cookie" className="w-70 w-50-ns" />
+                <img
+                    src={IMAGE_URL}
+                    loading="lazy"
+                    alt={intl.formatMessage({ id: 'valtech.fortune-cookies.image-alt' })}
+                    className="w-70 w-50-ns"
+                />
             </div>
         </div>
     )
